@@ -14,7 +14,7 @@
     "scripts": [
       "build/background.bundle.js"
     ],
-    "persistent": true
+    "persistent": false
   },
   "browser_action": {
     "default_icon": {
