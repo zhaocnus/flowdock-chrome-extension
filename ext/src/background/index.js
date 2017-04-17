@@ -1,3 +1,5 @@
+import { saveThread } from '../api';
+
 chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
   let url = new URL(details.url);
 
@@ -21,8 +23,9 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
   chrome.tabs.sendMessage(details.tabId, { type: 'SCRAPE_THREAD_DATA' }, response => {
     thread.text = response;
 
-    console.log(thread);
+    saveThread((err, res) => {
+      console.log(err);
+      console.log(res);
+    });
   });
-
-
 });
