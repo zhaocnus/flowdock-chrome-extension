@@ -4,12 +4,11 @@ const threads = new PouchDB('threads', {
   adapter: 'idb'
 });
 
-export function saveThread(cb) {
-  threads.put({
-    _id: 'mydoc',
-    title: 'Heroes'
-  }, (err, res) => {
+export function saveThread(thread, cb) {
+  console.log(thread);
+
+  threads.put(thread, (err) => {
     if (err) return cb(err);
-    cb(null, res);
+    cb();
   });
 }

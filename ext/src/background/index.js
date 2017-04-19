@@ -1,31 +1,28 @@
 import { saveThread } from '../api';
+import { SCRAPE_THREAD_DATA } from '../constants/messageTypes';
 
 chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
-  let url = new URL(details.url);
+  let url, segments;
 
-  // get thread id from url
+  // get thread info from url
   // Example:
-  // https://www.flowdock.com/app/<company_name>/<flow_name>/threads/fzmGbpx_blEX5ctrjfyvy5EH5_8
+  // https://www.flowdock.com/app/signifyd/dev/threads/fzmGbpx_blEX5ctrjfyvy5EH5_8
+  // https://www.flowdock.com/app/<company_name>/<flow_name>/threads/<thread_id>
+  url = new URL(details.url);
   if (url.origin !== 'https://www.flowdock.com') return;
 
-  let segments = url.pathname.split('/').slice(-3);
-
-  if (segments.length < 3) return;
-
-  if (segments[1] !== 'threads') return;
+  segments = url.pathname.split('/').slice(-3);
+  if (segments.length < 3 || segments[1] !== 'threads') return;
 
   let thread = {
     url: details.url,
-    flow: segments[0],
-    id: segments[2]
+    flowName: segments[0],
+    threadId: segments[2]
   };
 
-  chrome.tabs.sendMessage(details.tabId, { type: 'SCRAPE_THREAD_DATA' }, response => {
-    thread.text = response;
+  chrome.tabs.sendMessage(details.tabId, { type: SCRAPE_THREAD_DATA }, res => {
+    thread.texts = res;
 
-    saveThread((err, res) => {
-      console.log(err);
-      console.log(res);
-    });
+    saveThread(thread, () => {});
   });
 });
