@@ -14,7 +14,7 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
   segments = url.pathname.split('/').slice(-3);
   if (segments.length < 3 || segments[1] !== 'threads') return;
 
-  let thread = {
+  const thread = {
     url: details.url,
     flowName: segments[0],
     threadId: segments[2]
@@ -23,6 +23,8 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
   chrome.tabs.sendMessage(details.tabId, { type: SCRAPE_THREAD_DATA }, res => {
     thread.texts = res;
 
-    saveThread(thread, () => {});
+    console.log(res);
+
+    saveThread(thread);
   });
 });

@@ -4,8 +4,28 @@ function getElementTextContent(el) {
   return el ? el.textContent.replace(/\r?\n|\r/, '').trim() : '';
 }
 
+function getThreadTexts(threadContentEl) {
+  const texts = threadContentEl.querySelectorAll('ul.thread-activities li.chat-message');
+
+  if (texts.length < 1) return [];
+
+  // texts is a NodeList, NOT an array
+  return [...texts].map(el => {
+    const authorEl = el.querySelector('.message-author');
+    const timestamp = el.querySelector('.timestamp');
+    const messageEl = el.querySelector('.msg-body');
+
+    return {
+      author: getElementTextContent(authorEl),
+      authorId: authorEl && authorEl.getAttribute('data-user'),
+      timestamp: timestamp && timestamp.getAttribute('datetime'),
+      message: getElementTextContent(messageEl)
+    };
+  });
+}
+
 function scrapeThreadContent(res) {
-  let threadContentEl, titleEl, texts, content;
+  let threadContentEl, titleEl;
 
   threadContentEl = document.querySelector('#thread .thread-content');
   if (!threadContentEl) return res();
@@ -13,20 +33,10 @@ function scrapeThreadContent(res) {
   titleEl = threadContentEl.querySelector('.title-body');
   if (!titleEl) return res();
 
-  content = {
-    title: getElementTextContent(titleEl)
-  };
-
-  texts = threadContentEl.querySelectorAll('.thread-activities .chat-message');
-  if (!texts) return res(content);
-
-  content.texts = texts.map(el => ({
-    author: getElementTextContent(el.querySelector('.message-author')),
-    timestamp: getElementTextContent(el.querySelector('.timestamp')),
-    message: getElementTextContent(el.querySelector('.msg-body'))
-  }));
-
-  res(content);
+  res({
+    title: getElementTextContent(titleEl),
+    texts: getThreadTexts(threadContentEl)
+  });
 }
 
 chrome.runtime.onMessage.addListener((req, sender, res) => {
