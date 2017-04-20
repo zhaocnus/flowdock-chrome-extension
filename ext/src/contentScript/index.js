@@ -28,10 +28,10 @@ function scrapeThreadContent(res) {
   let threadContentEl, titleEl;
 
   threadContentEl = document.querySelector('#thread .thread-content');
-  if (!threadContentEl) return res();
+  if (!threadContentEl) return res({ err: true });
 
   titleEl = threadContentEl.querySelector('.title-body');
-  if (!titleEl) return res();
+  if (!titleEl) return res({ err: true });
 
   res({
     title: getElementTextContent(titleEl),

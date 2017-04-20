@@ -21,9 +21,11 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(details => {
   };
 
   chrome.tabs.sendMessage(details.tabId, { type: SCRAPE_THREAD_DATA }, res => {
-    thread.texts = res;
+    if (res.err) return;
 
-    console.log(res);
+    // save thread title
+    // TODO: save thread texts
+    thread.title = res.title;
 
     saveThread(thread);
   });
